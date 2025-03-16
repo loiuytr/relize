@@ -32,7 +32,7 @@ grond_y = HEIGHT - playr_height
 running = True
 
 background = transform.scale(image.load("Fon.png"), (WIDTH, HEIGHT))
-player_skin = transform.scale(image.load("1234.png"), (playr_width, playr_height))
+player_skin = transform.scale(image.load("Character.png"), (playr_width, playr_height))
 def reset_player():
     global playr_x, playr_y, jump, start_jump
     playr_x = 0  
@@ -59,15 +59,22 @@ def draw_menu():
 def draw_level():
     font = pygame.font.Font(None, 74)
     text_level1 = font.render('Level 1', True, (255, 255, 255))
+    text_level2 = font.render("Level 2",True,(255,255,255))
+                              
 
     Level_1 = text_level1.get_rect(center=(WIDTH // 2, HEIGHT // 2))
+    Level_2 = text_level2.get_rect(center=(WIDTH//2,HEIGHT//3))
     
     screen.fill((0, 0, 0))  
     screen.blit(text_level1, Level_1)
+    screen.blit(text_level2,Level_2)
+
+
+
     
     pygame.display.flip()
 
-    return Level_1
+    return Level_1,Level_2
 
 
 class Barriel:
@@ -106,7 +113,8 @@ def menu():
                             if e.type == pygame.QUIT:
                                 level_active = False
                                 running = False
-                        Level_1 = draw_level()
+                        Level_1,Level_2 = draw_level()
+                        
                         if e.type == pygame.MOUSEBUTTONDOWN:
                             mouse_pos = pygame.mouse.get_pos()
                             if Level_1.collidepoint(mouse_pos):
@@ -134,11 +142,23 @@ while running:
     wall6 = Barriel((0,0,0),1000,550,5,50)
     wall7 = Barriel((0,0,0),1100,550,5,50)
     wall8 = Barriel((0,0,0),1000,550,100,5)
+    finish = Barriel((0, 255, 0),1180,500,200,100)
 
+    level2=False
+
+    while level2:
+        for e in pygame.event.get():
+            if e.type == pygame.QUIT:
+                level2 = False
+        
+        screen.blit(background, (0, 0))
     while running:
         for e in pygame.event.get():
             if e.type == pygame.QUIT:
                 running = False
+
+
+        
 
         keys = pygame.key.get_pressed()
 
@@ -148,6 +168,7 @@ while running:
         enemy1_rect = pygame.Rect(enemy1.x, enemy1.y, enemy1.width, enemy1.height)
         enemy2_rect = pygame.Rect(enemy2.x, enemy2.y, enemy2.width, enemy2.height)
         wall5_rect = pygame.Rect(wall5.x, wall5.y, wall5.width, wall5.height)
+        finish_rect = pygame.Rect(finish.x,finish.y,finish.width,finish.height)
 
         if keys[pygame.K_a] and playr_x > 0:
             new_rect = player_rect.move(-playr_speed, 0)
@@ -221,6 +242,15 @@ while running:
             pygame.time.delay(2000)
             menu()
             reset_player()
+        if player_rect.colliderect(finish_rect):
+            font = pygame.font.Font(None, 74)
+            lose_text = font.render('You Win!!', True, (255, 255, 255))
+            screen.fill((0, 0, 0))
+            screen.blit(lose_text, lose_text.get_rect(center=(WIDTH // 2, HEIGHT // 2)))
+            pygame.display.flip()
+            pygame.time.delay(2000)
+            menu()
+            reset_player()
 
         screen.blit(background, (0, 0))
         
@@ -238,6 +268,7 @@ while running:
         wall6.draw()
         wall7.draw()
         wall8.draw()
+        finish.draw()
 
         pygame.display.flip()
         pygame.time.Clock().tick(FPS)
